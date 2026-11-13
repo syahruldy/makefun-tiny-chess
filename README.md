@@ -1,40 +1,40 @@
-# Tiny Chess Engine — make.fun tiny-chess-01
+# tiny-chess-01 entry: trial-9 engine
 
-A from-scratch chess engine in a single `main.py`, built for the
-tiny-chess-01 bounty: the strongest engine that fits in 4096 bytes.
+A scratch-built chess engine in one `main.py`, squeezed into
+4096 bytes for the tiny-chess-01 bounty.
 
-## Design
+## How it plays
 
-- **Board:** 120-square mailbox (A1 = 91, A8 = 21), FEN parser,
-  pseudo-legal move generation with make/unmake legality filtering.
-- **Search:** negamax with alpha-beta pruning, quiescence over
-  captures, en-passant captures and promotions, a transposition
-  table keyed on board plus side, castling rights and en-passant
-  square, killer-move ordering and MVV-LVA capture ordering.
-- **Pruning:** null-move pruning (reduction 3, skipped in check)
-  and late-move reductions for quiet moves after the first four.
-- **Time control:** iterative deepening on a fixed budget of
-  120000 nodes per move. No wall clock, no randomness: the same
-  position always produces the same move, so the live run and its
-  replay match move for move.
-- **Evaluation:** material plus pawn advancement and centre bonus,
-  knight centralisation, development bonus for minor pieces off
-  their home squares, and a castling bonus.
+- **Board:** 120-square mailbox, A1 at 91 and A8 at 21, with a
+  FEN reader and pseudo-legal generation plus make/unmake
+  legality checks.
+- **Search:** negamax alpha-beta, quiescence over captures,
+  en-passant takes and promotions, transposition table keyed
+  on position, side, castling and en-passant, killer moves
+  and MVV-LVA ordering for captures.
+- **Pruning:** null-move pruning at reduction 3 (never in
+  check) and late-move reductions on quiet moves past the
+  first four.
+- **Budget:** iterative deepening capped at 120000 nodes per
+  move. No clock, no random numbers: a position always yields
+  the same move, so live play and replay agree.
+- **Evaluation:** material, pawn advance and centre, knight
+  centralisation, development and castling, a bishop-pair
+  bonus, and king centralisation in the endgame.
 
 ## Packing
 
-The engine source is 5325 bytes, over the 4096 byte limit, so
-`main.py` ships it compressed (zlib + base64) with a small
-unpacker that decompresses and executes it. Compressed payloads
-are explicitly allowed by the competition rules.
+The source is 5626 bytes, past the limit, so `main.py`
+carries it zlib-compressed and base64-encoded with a tiny
+unpacker. The rules allow compressed payloads.
 
-## Local testing
+## Local trials
 
-Verified with perft on all five standard positions (startpos,
-kiwipete, positions 3, 4 and 5) and played against the kit's
-local practice gauntlet. Best local trial: 2 wins, 2 draws,
-4 losses against the eight house anchors, about 1253 Elo.
+Perft is green on the five standard positions. Trial 9 on the
+kit practice gauntlet: 3 wins, 2 draws, 3 losses, 1396 Elo —
+above the 1325 house baseline mean. Earlier trials: bishop
+pair alone 1253, passed-pawn bonus 1173 (reverted).
 
 ## License
 
-MIT. See LICENSE.
+MIT, see LICENSE.

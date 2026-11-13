@@ -1,47 +1,31 @@
-# Transcript
+# Development log, trial 9
 
-This entry was developed in a single Muse session on 2026-11-12.
+Built in Muse sessions on 2026-11-12 and 2026-11-13.
 
-## What was built
+## The engine
 
-A chess engine written from scratch in Python for the
-tiny-chess-01 bounty. The engine was designed, implemented and
-tested entirely in-session: the board representation, move
-generator, search, evaluation and the environment driver loop
-were all authored by the agent in this session.
+Written from scratch in-session: board, move generator,
+search, evaluation and the env driver loop. Nothing was
+copied from an existing engine.
 
-## Development log
+## Trial history
 
-1. Wrote the first version: 120-square board, FEN parser,
-   pseudo-legal generation with legality filtering, negamax
-   alpha-beta, quiescence, transposition table, killer moves,
-   MVV-LVA ordering, iterative deepening with a 60000 node
-   budget. Validated with perft on five standard positions.
-2. First local gauntlet trial: 0 wins, 0 draws, 8 losses.
-   Diagnosed two problems: the evaluation rewarded pushing
-   edge pawns over developing pieces, and the search only
-   reached depth 4. Fixed the evaluation (development and
-   castling bonuses, smaller pawn-push bonus) and restructured
-   the search to test legality inline instead of filtering
-   twice, nearly doubling the node rate.
-3. Second trial: 0 wins, 2 draws, 6 losses, about 1090 Elo.
-   Added null-move pruning. Third trial: 2 wins, 1 draw,
-   5 losses, about 1173 Elo.
-4. Profiled the engine, removed string method calls from the
-   hot paths (upper and isupper), and added late-move
-   reductions while raising the node budget to 120000.
-   Fourth trial: 2 wins, 2 draws, 4 losses, about 1253 Elo.
-5. Tried replacing the formula evaluation with standard
-   piece-square tables. Two trials both scored 1087 Elo,
-   worse than the formula version, so the change was reverted.
-6. Packed the final engine with zlib plus base64 to fit the
-   4096 byte limit and verified the packed file still passes
-   perft and produces the same moves.
+- T1: 0W 0D 8L. Eval pushed edge pawns; search too shallow.
+- T2: fixed eval, inline legality: 0W 2D 6L, ~1090 Elo.
+- T3: added null-move pruning: 2W 1D 5L, ~1173 Elo.
+- T4: hot-path cleanup, late-move reductions, 120k nodes:
+  2W 2D 4L, ~1253 Elo. Submitted as the first entry.
+- T5/T6: Michniewski piece-square tables: 1087 Elo twice.
+  Reverted; the formula eval stays.
+- T7: bishop-pair bonus +30: 1W 4D 3L, 1253 Elo. Neutral.
+- T8: passed-pawn bonus on top: 0W 5D 3L, 1173 Elo.
+  Worse; reverted.
+- T9: endgame king centralisation (both sides under 1400
+  material): 3W 2D 3L, 1396 Elo. Submitted as the new entry.
 
-## Verification
+## Checks
 
-- Perft passes on all five standard positions.
-- The packed `main.py` decompresses to the tested engine source
-  byte for byte and plays the same moves.
-- The engine is deterministic: fixed node budget, no clock,
-  no randomness.
+- Perft is green on the five standard positions.
+- The packed `main.py` decompresses to the tested source
+  byte for byte (verified by chunk hashes).
+- Deterministic: fixed node budget, no clock, no randomness.
